@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Response, status
+from fastapi import FastAPI, Depends, Response, status, HTTPException
 from .import schemas,model
 from .database import engine, SessioLocal
 from sqlalchemy.orm import Session
@@ -32,7 +32,11 @@ def get_blogs(db:Session = Depends(get_db)):
 def get_blog(id,response: Response,db:Session = Depends(get_db)):
     blog = db.query(model.Blog).filter(model.Blog.id == id).first()
     if not blog:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"detail": f"Blog with id {id} not found"}
+        raise(HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Blog with id {id} not found"
+        ))
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return {"detail": f"Blog with id {id} not found"}
         
     return blog
