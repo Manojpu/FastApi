@@ -17,5 +17,5 @@ def about():
     }}
 
 @app.get("/blog/{id}")
-def show(id):
+def show(id: int):
     return {"data":id}
