@@ -31,9 +31,15 @@ def delete_blog( id,db:Session = Depends(get_db)):
 
 @app.put("/blog/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update_blog(id,request: schemas.Blog,db: Session = Depends(get_db)):
-    db.query(model.Blog).filter(model.Blog.id == id).update({
+    blog = db.query(model.Blog).filter(model.Blog.id == id).update({
         'title': 'Updated title',
     })
+    if not blog:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Blog with id {id} not found"
+        )
+    blog.update(request)
     db.commit()
     return {"data": f"Blog with id {id} updated"}
 
