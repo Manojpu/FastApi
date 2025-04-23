@@ -49,7 +49,7 @@ def get_blogs(db:Session = Depends(get_db)):
     blogs = db.query(model.Blog).all()
     return blogs
 
-@app.get("/blog/{id}")
+@app.get("/blog/{id}",response_model= schemas.ShowBlog)
 def get_blog(id,response: Response,db:Session = Depends(get_db)):
     blog = db.query(model.Blog).filter(model.Blog.id == id).first()
     if not blog:
