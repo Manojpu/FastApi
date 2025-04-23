@@ -28,7 +28,15 @@ def delete_blog( id,db:Session = Depends(get_db)):
     blog = db.query(model.Blog).filter(model.Blog.id == id).delete(synchronize_session=False)
     db.commit()
     return "Done"
-     
+
+@app.put("/blog/{id}", status_code=status.HTTP_202_ACCEPTED)
+def update_blog(id,request: schemas.Blog,db: Session = Depends(get_db)):
+    db.query(model.Blog).filter(model.Blog.id == id).update({
+        'title': 'Updated title',
+    })
+    db.commit()
+    return {"data": f"Blog with id {id} updated"}
+
 
 @app.get("/blog")
 def get_blogs(db:Session = Depends(get_db)):
