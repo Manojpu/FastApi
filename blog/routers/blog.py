@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 from typing import List
-from ..import schemas, model, database
+from ..import schemas, model
 from sqlalchemy.orm import Session
+from ..repository import blog
 
 router = APIRouter(
     prefix="/blog",
@@ -11,16 +12,12 @@ from ..database import get_db
 
 @router.get("/",response_model=List[schemas.ShowBlog])
 def get_blogs_all(db: Session = Depends(get_db)):
-    blogs = db.query(model.Blog).all()
-    return blogs
+
+    return blog.get_all(db)
 
 @router.post("/", response_model=schemas.ShowBlog)
 def create_blog(request: schemas.Blog, db: Session = Depends(get_db)):
-    new_blog = model.Blog(title=request.title, body=request.body, published=request.published,user_id=1)
-    db.add(new_blog)
-    db.commit()
-    db.refresh(new_blog)
-    return new_blog
+    return blog.create(request, db)
 
 @router.get("/", response_model=List[schemas.ShowBlog])
 def get_blogs(db: Session = Depends(get_db)):
