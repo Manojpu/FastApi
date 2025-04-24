@@ -1,7 +1,9 @@
-from .. import model
-from fastapi import HTTPException, status 
+from .. import model,schemas
+from fastapi import HTTPException, status , Depends
+from ..oauth2 import get_current_user  # Import get_current_user
 from sqlalchemy.orm import Session
-def get_all(db: Session):
+from ..database import get_db
+def get_all(db: Session = Depends(get_db),get_current_user: schemas.User = Depends(get_current_user)):
     blogs = db.query(model.Blog).all()
     return blogs
 
