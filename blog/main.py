@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends, Response, status, HTTPException
-from . import schemas, model
+from . import schemas, model,hashing
 from .database import engine, SessioLocal
 from sqlalchemy.orm import Session
 from typing import List
+
 
 model.Base.metadata.create_all(engine)
 
@@ -66,10 +67,23 @@ def update_blog(id: int, request: schemas.Blog, db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Blog with id {id} updated successfully."}
 
-@app.post("/user", response_model=schemas.ShowUser)
+
+
+@app.post("/user", response_model=schemas.ShowUser,tags=["User"])
 def create_user(request: schemas.User, db: Session = Depends(get_db)):
-    new_user = model.User(name=request.name, email=request.email, password=request.password)
+    
+    new_user = model.User(name=request.name, email=request.email, password=hashing.Hash.bcrypt(request.password))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return new_user
+
+@app.get("/user/{id}", response_model=schemas.ShowUser,tags=["User"])
+def get_user(id,db:Session = Depends(get_db)):
+    user = db.query(model.User).filter(model.User.id == id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {id} not found"
+        )
+    return user
