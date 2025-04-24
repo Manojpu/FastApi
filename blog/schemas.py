@@ -1,16 +1,16 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class Blog(BaseModel):
+class BlogBase(BaseModel):
     title: str
     body: str
     published: Optional[bool] = True
+   
+class Blog(BlogBase):
+     class Config:
+        form_attribute = True
 
-class ShowBlog(Blog):
-    title: str
-    published: bool
-    class Config():
-        from_attributes = True
+
        
 
 class User(BaseModel):
@@ -21,5 +21,13 @@ class User(BaseModel):
 class ShowUser(BaseModel):
     name: str
     email: str
+    blogs: list[Blog] = []
     class Config:
+        from_attributes = True
+
+class ShowBlog(Blog):
+    title: str
+    published: bool
+    creater: ShowUser
+    class Config():
         from_attributes = True
