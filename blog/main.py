@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, Response, status, HTTPException
 from . import schemas, model,hashing
-from .database import engine, SessioLocal
+from .database import engine, get_db
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -9,13 +9,7 @@ model.Base.metadata.create_all(engine)
 
 app = FastAPI()
 
-# Dependency
-def get_db():
-    db = SessioLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
 
 @app.post("/blog", response_model=schemas.ShowBlog)
 def create_blog(request: schemas.Blog, db: Session = Depends(get_db)):
