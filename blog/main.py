@@ -3,12 +3,13 @@ from . import schemas, model,hashing
 from .database import engine, get_db
 from sqlalchemy.orm import Session
 from typing import List
-
+from .routers import blog
 
 model.Base.metadata.create_all(engine)
 
 app = FastAPI()
 
+app.include_router(blog.router)
 
 
 @app.post("/blog", response_model=schemas.ShowBlog)
